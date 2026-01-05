@@ -1,4 +1,4 @@
-# Design Document
+# README AND DESIGN DOCUMENT
 
 By Elisa Bennett
 
