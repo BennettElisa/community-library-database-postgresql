@@ -175,6 +175,16 @@ Per the queries in the `queries.sql` it is common for book names to be looked up
 
 ## Limitations
 
-The current schema assumes that book look up will happen on the first or last name but in the actual UI a user might type the full name of the author. In future iterations including another
-column in the authors table for `full_name` will help take into account the user experience and optimize the query for faster lookup by adding a column to capture the full name of the author.
-Another option would be to create a VIEW that combines the first_name and last_name of the authors and use the VIEW for queries that use the full name of the author.
+The current schema assumes book lookups will happen using first or last name separately, but in the actual UI a user might type the author's full name. In future iterations, there are two potential solutions: adding a `full_name` column to the authors table with an index for faster lookups, or creating a VIEW that combines `first_name` and `last_name` and querying against that VIEW when users search by full name.
+Another limitation is the UNIQUE constraint on the `isbn` column in the `books` table, which means we can only store one ISBN per book record. Since different formats of the same book (hardcover, paperback, ebook) have different ISBNs, this forces duplicate book entries. One solution would be to move the ISBN column to the `meta_data` table where it better represents edition-specific information. We could also rename `meta_data` to `editions` to better reflect that it represents specific editions/formats of books. This would allow us to "roll up" formats by querying all editions with the same book_id:
+
+```
+books:
+  id=1, title="The Hobbit"
+
+editions:
+  id=1, book_id=1, isbn="ISBN-A", binding="hardcover"
+  id=2, book_id=1, isbn="ISBN-B", binding="paperback"
+  id=3, book_id=1, isbn="ISBN-C", binding="kindle edition"
+
+```
